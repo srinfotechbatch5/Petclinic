@@ -1,53 +1,59 @@
 pipeline{
-    
-	agent any
-    
+
+    agent any
+
     stages{
-        
-        stage('clone'){
-            
+        stage('Clone Project'){
+
             steps{
                 git branch: 'feature/2026.02.18', url: 'https://github.com/srinfotechbatch5/Petclinic.git'
-                
             }
         }
         stage('Build'){
-            
+
             steps{
-             bat 'mvn install'
-                
+
+                bat 'mvn clean install'
             }
         }
 
         stage('Test'){
-            
+
             steps{
-             bat 'mvn test'
-                
+
+                bat 'mvn test'
             }
         }
-		
-		stage('Published  the Test Results'){
-            
+
+        stage('Package'){
+
             steps{
-             junit 'target/surefire-reports/*.xml'
-                
+
+                bat 'mvn package'
+            }
+        }
+
+        stage('Generated the Tets Results'){
+
+            steps{
+
+                junit 'target/surefire-reports/*.xml'
             }
         }
 
         stage('Generated Artifacts'){
-            
+
             steps{
-           archiveArtifacts artifacts: 'target/*.war', followSymlinks: false
-                
+
+                archiveArtifacts artifacts: 'target/*.war', followSymlinks: false
             }
         }
 
-         stage('Deploy'){
-            
+        stage('Deploy'){
+
             steps{
-          
-                deploy adapters: [tomcat9(alternativeDeploymentContext: '', credentialsId: 'TomcatCredentials', path: '', url: 'http://localhost:8080/')], contextPath: 'SRINFOETCHSpringPetclinicApplication', war: 'target/*.war'
+
+                deploy adapters: [tomcat9(alternativeDeploymentContext: '', credentialsId: 'TomcatCredentialsNew', path: '', url: 'http://localhost:8080/')], contextPath: 'PetRegistration', war: 'target/*.war'
             }
         }
     }
